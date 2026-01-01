@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demodog Sprite Preview - Save Ismael</title>
+  <style>
+    body {
+      margin: 0;
+      background: #0a0a12;
+      font-family: Arial, sans-serif;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      text-align: center;
+      max-width: 800px;
+      padding: 20px;
+    }
+    h1 {
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      color: #888;
+      margin-bottom: 30px;
+    }
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 128px);
+      gap: 10px;
+      margin: 20px auto;
+      padding: 20px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      width: fit-content;
+    }
+    .frame {
+      width: 128px;
+      height: 128px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid #00ffcc;
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+    }
+    .frame-label {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      font-size: 10px;
+      color: #00ffcc;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+    canvas {
+      border: 2px solid #00ffcc;
+      border-radius: 10px;
+      margin: 20px 0;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.3);
+    }
+    .info {
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      text-align: left;
+    }
+    .info h3 {
+      color: #00ffcc;
+      margin-top: 0;
+    }
+    .button {
+      background: #00ffcc;
+      color: #0a0a12;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      margin: 10px;
+    }
+    .button:hover {
+      background: #00e6b8;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🐺 DEMODOG SPRITE PREVIEW</h1>
+    <p class="subtitle">Temporary placeholder for Save Ismael sprite system</p>
+
+    <div>
+      <button class="button" onclick="playAnimation('idle')">▶ Idle</button>
+      <button class="button" onclick="playAnimation('walk')">▶ Walk</button>
+      <button class="button" onclick="playAnimation('attack')">▶ Attack</button>
+      <button class="button" onclick="playAnimation('death')">▶ Death</button>
+    </div>
+
+    <canvas id="animCanvas" width="256" height="256"></canvas>
+
+    <div class="info">
+      <h3>📋 Sprite Sheet Layout (512x512)</h3>
+      <p>This is a <strong>temporary SVG sprite</strong> showing how the final sprite will look.</p>
+      <div class="preview-grid" id="spriteGrid"></div>
+
+      <h3>🎨 Style Guide</h3>
+      <ul>
+        <li><strong>Body:</strong> Dark silhouette (#1a1a1a)</li>
+        <li><strong>Eyes:</strong> Glowing teal (#00ffcc)</li>
+        <li><strong>Mouth:</strong> Glowing teal (#00ffcc)</li>
+        <li><strong>Size:</strong> Small quadrupedal horror (dog-like)</li>
+      </ul>
+
+      <h3>🎮 In-Game Features</h3>
+      <ul>
+        <li>✅ Billboard rendering (always faces camera)</li>
+        <li>✅ Ground shadow projection</li>
+        <li>✅ Particle trail (infection spores)</li>
+        <li>✅ Screen shake on hit</li>
+        <li>✅ Death explosion effect</li>
+      </ul>
+
+      <h3>📝 Next Steps</h3>
+      <ol>
+        <li>Use this as reference for final sprite art</li>
+        <li>Create in Aseprite with more detail (teeth, legs, etc.)</li>
+        <li>Add smooth animation frames (4-6 frames per action)</li>
+        <li>Export as 512x512 PNG to <code>/client/public/assets/sprites/demodog_sheet.png</code></li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('animCanvas');
+    const ctx = canvas.getContext('2d');
+    const grid = document.getElementById('spriteGrid');
+
+    // Animation frames config
+    const animations = {
+      idle: { start: 0, end: 1, fps: 4 },
+      walk: { start: 2, end: 5, fps: 8 },
+      attack: { start: 6, end: 9, fps: 12 },
+      hurt: { start: 10, end: 11, fps: 8 },
+      death: { start: 12, end: 15, fps: 10 }
+    };
+
+    const frameLabels = [
+      'Idle 1', 'Idle 2', 'Walk 1', 'Walk 2',
+      'Walk 3', 'Walk 4', 'Attack 1', 'Attack 2',
+      'Attack 3', 'Attack 4', 'Hurt 1', 'Hurt 2',
+      'Death 1', 'Death 2', 'Death 3', 'Death 4'
+    ];
+
+    // Create sprite frames
+    function createDemodogSVG(frameIndex) {
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', '128');
+      svg.setAttribute('height', '128');
+      svg.setAttribute('viewBox', '0 0 128 128');
+
+      // Body (dark silhouette) - simple dog shape
+      const body = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      body.setAttribute('cx', '64');
+      body.setAttribute('cy', '70');
+      body.setAttribute('rx', '35');
+      body.setAttribute('ry', '25');
+      body.setAttribute('fill', '#1a1a1a');
+      body.setAttribute('stroke', '#0a0a0a');
+      body.setAttribute('stroke-width', '2');
+      svg.appendChild(body);
+
+      // Head
+      const head = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      head.setAttribute('cx', '64');
+      head.setAttribute('cy', '45');
+      head.setAttribute('rx', '25');
+      head.setAttribute('ry', '22');
+      head.setAttribute('fill', '#1a1a1a');
+      head.setAttribute('stroke', '#0a0a0a');
+      head.setAttribute('stroke-width', '2');
+      svg.appendChild(head);
+
+      // Legs (simple lines)
+      for (let i = 0; i < 4; i++) {
+        const leg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const xOffset = (i < 2 ? -15 : 15);
+        const xPos = 64 + xOffset + (i % 2 === 0 ? -8 : 8);
+        leg.setAttribute('x1', xPos);
+        leg.setAttribute('y1', '85');
+        leg.setAttribute('x2', xPos);
+        leg.setAttribute('y2', '105');
+        leg.setAttribute('stroke', '#1a1a1a');
+        leg.setAttribute('stroke-width', '4');
+        leg.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(leg);
+      }
+
+      // Eyes (glowing teal)
+      const createEye = (cx) => {
+        // Outer glow
+        const glow = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        glow.setAttribute('cx', cx);
+        glow.setAttribute('cy', '40');
+        glow.setAttribute('r', '8');
+        glow.setAttribute('fill', '#00ffcc');
+        glow.setAttribute('opacity', '0.3');
+        glow.setAttribute('filter', 'blur(4px)');
+        svg.appendChild(glow);
+
+        // Core eye
+        const eye = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        eye.setAttribute('cx', cx);
+        eye.setAttribute('cy', '40');
+        eye.setAttribute('r', '5');
+        eye.setAttribute('fill', '#00ffcc');
+        svg.appendChild(eye);
+      };
+      createEye(54);
+      createEye(74);
+
+      // Mouth (glowing)
+      const mouthGlow = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      mouthGlow.setAttribute('cx', '64');
+      mouthGlow.setAttribute('cy', '55');
+      mouthGlow.setAttribute('rx', '12');
+      mouthGlow.setAttribute('ry', '8');
+      mouthGlow.setAttribute('fill', '#00ffcc');
+      mouthGlow.setAttribute('opacity', '0.3');
+      mouthGlow.setAttribute('filter', 'blur(3px)');
+      svg.appendChild(mouthGlow);
+
+      const mouth = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+      mouth.setAttribute('cx', '64');
+      mouth.setAttribute('cy', '55');
+      mouth.setAttribute('rx', '8');
+      mouth.setAttribute('ry', '5');
+      mouth.setAttribute('fill', '#00ffcc');
+      svg.appendChild(mouth);
+
+      // Add variation based on frame
+      if (frameIndex >= 6 && frameIndex <= 9) {
+        // Attack - mouth bigger
+        mouth.setAttribute('ry', '10');
+        mouthGlow.setAttribute('ry', '14');
+      }
+      if (frameIndex >= 12 && frameIndex <= 15) {
+        // Death - fade out
+        svg.setAttribute('opacity', '0.5');
+      }
+
+      return svg;
+    }
+
+    // Generate sprite sheet preview
+    for (let i = 0; i < 16; i++) {
+      const frame = document.createElement('div');
+      frame.className = 'frame';
+
+      const label = document.createElement('div');
+      label.className = 'frame-label';
+      label.textContent = frameLabels[i];
+      frame.appendChild(label);
+
+      const svg = createDemodogSVG(i);
+      frame.appendChild(svg);
+      grid.appendChild(frame);
+    }
+
+    // Animation player
+    let currentAnim = 'idle';
+    let currentFrame = 0;
+    let lastFrameTime = 0;
+
+    function playAnimation(animName) {
+      if (animations[animName]) {
+        currentAnim = animName;
+        currentFrame = animations[animName].start;
+      }
+    }
+
+    function animate(timestamp) {
+      const anim = animations[currentAnim];
+      const frameDelay = 1000 / anim.fps;
+
+      if (timestamp - lastFrameTime >= frameDelay) {
+        // Clear canvas
+        ctx.fillStyle = '#0a0a12';
+        ctx.fillRect(0, 0, 256, 256);
+
+        // Draw current frame
+        const svg = createDemodogSVG(currentFrame);
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, 64, 64, 128, 128);
+        };
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+
+        // Advance frame
+        currentFrame++;
+        if (currentFrame > anim.end) {
+          currentFrame = anim.start; // Loop
+        }
+
+        lastFrameTime = timestamp;
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    playAnimation('idle');
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
