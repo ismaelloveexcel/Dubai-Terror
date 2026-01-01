@@ -6,6 +6,7 @@
 import { Scene, Vector3 } from '@babylonjs/core';
 import { Enemy } from './Enemy';
 import { Demodog } from './Demodog';
+import { DemodogSprite } from './DemodogSprite'; // NEW: Sprite version!
 import { Demobat } from './Demobat';
 import { Demogorgon } from './Demogorgon';
 import { MindFlayer } from './MindFlayer';
@@ -62,7 +63,10 @@ export class EnemyManager {
         
         switch (config.type) {
             case 'demodog':
-                enemy = new Demodog(this.scene, config.position);
+                // SPRITE VERSION: Using Enter the Gungeon-style sprite rendering!
+                enemy = new DemodogSprite(this.scene, config.position);
+                // To use old 3D version, uncomment below:
+                // enemy = new Demodog(this.scene, config.position);
                 break;
             case 'demobat':
                 enemy = new Demobat(this.scene, config.position);

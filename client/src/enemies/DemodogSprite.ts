@@ -21,7 +21,6 @@ export class DemodogSprite extends Enemy {
   private wanderTarget: Vector3 | null = null;
   private wanderTimer: number = 0;
   private currentAnimState: string = 'idle';
-  private attackCooldown: number = 0;
 
   constructor(scene: Scene, position: Vector3) {
     super(scene, EnemyType.DEMODOG, position);
@@ -142,10 +141,10 @@ export class DemodogSprite extends Enemy {
   /**
    * Override takeDamage to show hurt animation
    */
-  public takeDamage(amount: number): boolean {
-    const killed = super.takeDamage(amount);
+  public takeDamage(amount: number): void {
+    super.takeDamage(amount);
 
-    if (killed) {
+    if (this.isDead()) {
       this.playAnimation('death');
       if (this.spriteRenderer) {
         this.spriteRenderer.stopParticles();
@@ -162,8 +161,6 @@ export class DemodogSprite extends Enemy {
         }
       }, 200);
     }
-
-    return killed;
   }
 
   /**

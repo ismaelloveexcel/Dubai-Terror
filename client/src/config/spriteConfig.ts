@@ -4,6 +4,7 @@
  */
 
 import { SpriteConfig } from '../utils/SpriteRenderer';
+import { tempSpriteAssets } from './tempSpriteAssets';
 
 /**
  * Sprite asset configurations
@@ -30,7 +31,9 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
    * Row 4: Special/Glow variations
    */
   demodog: {
-    spriteSheetUrl: '/assets/sprites/demodog_sheet.png',
+    // Temporary: Uses SVG placeholder. Replace with real PNG when ready:
+    // spriteSheetUrl: '/assets/sprites/demodog_sheet.png',
+    spriteSheetUrl: tempSpriteAssets.demodog,
     frameWidth: 128,
     frameHeight: 128,
     totalFrames: 16,
