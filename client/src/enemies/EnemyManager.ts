@@ -4,6 +4,7 @@
  */
 
 import { Scene, Vector3 } from '@babylonjs/core';
+import { IEnemy } from '../types';
 import { Enemy } from './Enemy';
 import { Demodog } from './Demodog';
 import { DemodogSprite } from './DemodogSprite'; // NEW: Sprite version!
@@ -26,8 +27,8 @@ export interface WaveConfig {
 
 export class EnemyManager {
     private scene: Scene;
-    private enemies: Enemy[] = [];
-    private bosses: Map<string, Enemy> = new Map();
+    private enemies: IEnemy[] = [];
+    private bosses: Map<string, IEnemy> = new Map();
     private currentWave: number = 0;
     private waveConfigs: WaveConfig[] = [];
     private isWaveActive: boolean = false;
@@ -53,13 +54,13 @@ export class EnemyManager {
     /**
      * Spawn a single enemy
      */
-    public spawnEnemy(config: SpawnConfig): Enemy | null {
+    public spawnEnemy(config: SpawnConfig): IEnemy | null {
         if (this.enemies.length >= this.maxEnemies) {
             console.warn('Max enemies reached');
             return null;
         }
         
-        let enemy: Enemy | null = null;
+        let enemy: IEnemy | null = null;
         
         switch (config.type) {
             case 'demodog':
@@ -94,8 +95,8 @@ export class EnemyManager {
     /**
      * Spawn multiple enemies of the same type
      */
-    public spawnEnemies(config: SpawnConfig): Enemy[] {
-        const spawned: Enemy[] = [];
+    public spawnEnemies(config: SpawnConfig): IEnemy[] {
+        const spawned: IEnemy[] = [];
         const count = config.count || 1;
         
         for (let i = 0; i < count; i++) {
@@ -263,7 +264,7 @@ export class EnemyManager {
     /**
      * Get all enemies within range of a position
      */
-    public getEnemiesInRange(position: Vector3, range: number): Enemy[] {
+    public getEnemiesInRange(position: Vector3, range: number): IEnemy[] {
         return this.enemies.filter(enemy => {
             if (!enemy.isAlive || !enemy.mesh) return false;
             return Vector3.Distance(enemy.mesh.position, position) <= range;
@@ -273,8 +274,8 @@ export class EnemyManager {
     /**
      * Get the nearest enemy to a position
      */
-    public getNearestEnemy(position: Vector3): Enemy | null {
-        let nearest: Enemy | null = null;
+    public getNearestEnemy(position: Vector3): IEnemy | null {
+        let nearest: IEnemy | null = null;
         let nearestDistance = Infinity;
         
         this.enemies.forEach(enemy => {
@@ -316,7 +317,7 @@ export class EnemyManager {
     /**
      * Get a specific boss
      */
-    public getBoss(type: string): Enemy | null {
+    public getBoss(type: string): IEnemy | null {
         return this.bosses.get(type) || null;
     }
     

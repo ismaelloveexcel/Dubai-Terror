@@ -18,7 +18,7 @@ const COLORS = {
 /**
  * Generate a Demodog frame SVG
  */
-function createDemodogFrame(variant: 'idle' | 'walk' | 'attack' | 'hurt' | 'death' = 'idle'): string {
+function createDemodogFrame(variant: string = 'idle'): string {
   const mouthHeight = variant === 'attack' ? 14 : 8;
   const opacity = variant === 'death' ? 0.3 : 1;
   const legOffset = variant === 'walk' ? 5 : 0;
@@ -61,7 +61,7 @@ function createDemodogFrame(variant: 'idle' | 'walk' | 'attack' | 'hurt' | 'deat
 /**
  * Generate a Demobat frame SVG
  */
-function createDemobatFrame(variant: 'idle' | 'fly' | 'attack' | 'death' = 'idle'): string {
+function createDemobatFrame(variant: string = 'idle'): string {
   const wingAngle = variant === 'fly' ? 20 : 10;
   const opacity = variant === 'death' ? 0.3 : 1;
   const mouthOpen = variant === 'attack' ? 12 : 6;
@@ -95,7 +95,7 @@ function createDemobatFrame(variant: 'idle' | 'fly' | 'attack' | 'death' = 'idle
 /**
  * Generate a Demogorgon frame SVG (256x256 for detail)
  */
-function createDemogorgonFrame(variant: 'idle' | 'walk' | 'attack' | 'roar' | 'death' = 'idle'): string {
+function createDemogorgonFrame(variant: string = 'idle'): string {
   const opacity = variant === 'death' ? 0.3 : 1;
   const petalOpen = variant === 'roar' || variant === 'attack' ? 40 : 20;
   const scale = variant === 'attack' ? 1.1 : 1;
@@ -135,7 +135,7 @@ function createDemogorgonFrame(variant: 'idle' | 'walk' | 'attack' | 'roar' | 'd
 /**
  * Generate a Mind Flayer frame SVG
  */
-function createMindFlayerFrame(variant: 'idle' | 'attack' | 'summon' | 'death' = 'idle'): string {
+function createMindFlayerFrame(variant: string = 'idle'): string {
   const opacity = variant === 'death' ? 0.3 : 1;
   const tentacleWave = variant === 'attack' ? 15 : 5;
 
@@ -169,7 +169,7 @@ function createMindFlayerFrame(variant: 'idle' | 'attack' | 'summon' | 'death' =
 /**
  * Generate a Vecna frame SVG
  */
-function createVecnaFrame(variant: 'idle' | 'attack' | 'psychic' | 'teleport' | 'death' = 'idle'): string {
+function createVecnaFrame(variant: string = 'idle'): string {
   const opacity = variant === 'death' ? 0.3 : variant === 'teleport' ? 0.6 : 1;
   const armRaise = variant === 'psychic' || variant === 'attack' ? -30 : 0;
   const glowIntensity = variant === 'psychic' ? 12 : 6;
@@ -212,7 +212,7 @@ function createVecnaFrame(variant: 'idle' | 'attack' | 'psychic' | 'teleport' | 
 /**
  * Generate a Swarm creature frame SVG (smaller, 64x64)
  */
-function createSwarmFrame(variant: 'idle' | 'move' | 'attack' = 'idle'): string {
+function createSwarmFrame(variant: string = 'idle'): string {
   const tentacleWave = variant === 'move' ? 5 : 2;
 
   return `
@@ -242,7 +242,7 @@ function createSwarmFrame(variant: 'idle' | 'move' | 'attack' = 'idle'): string 
 /**
  * Generate a Flying enemy frame SVG
  */
-function createFlyingFrame(variant: 'idle' | 'fly' | 'attack' | 'death' = 'idle'): string {
+function createFlyingFrame(variant: string = 'idle'): string {
   const wingAngle = variant === 'fly' ? 25 : 15;
   const opacity = variant === 'death' ? 0.3 : 1;
 
@@ -275,7 +275,7 @@ function createFlyingFrame(variant: 'idle' | 'fly' | 'attack' | 'death' = 'idle'
 /**
  * Generate a Elite enemy frame SVG
  */
-function createEliteFrame(variant: 'idle' | 'walk' | 'attack' | 'death' = 'idle'): string {
+function createEliteFrame(variant: string = 'idle'): string {
   const opacity = variant === 'death' ? 0.3 : 1;
   const armRaise = variant === 'attack' ? -20 : 0;
 
