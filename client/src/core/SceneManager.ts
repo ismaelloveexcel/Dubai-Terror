@@ -121,35 +121,47 @@ export class SceneManager {
       [camera]
     );
     
-    // Bloom
+    // Apply mobile-optimized settings if on mobile
+    const isMobile = performanceConfig.isMobile;
+    const isHighEnd = performanceConfig.isHighEndMobile;
+    
+    // Bloom - Enhanced for visual impact
     if (visualConfig.postProcess.bloom.enabled) {
       this.renderPipeline.bloomEnabled = true;
-      this.renderPipeline.bloomThreshold = visualConfig.postProcess.bloom.threshold;
-      this.renderPipeline.bloomWeight = visualConfig.postProcess.bloom.weight;
-      this.renderPipeline.bloomKernel = visualConfig.postProcess.bloom.kernel;
-      this.renderPipeline.bloomScale = visualConfig.postProcess.bloom.scale;
+      if (isMobile && !isHighEnd) {
+        // Use mobile-optimized bloom settings
+        this.renderPipeline.bloomThreshold = visualConfig.mobileVisuals.bloom.threshold;
+        this.renderPipeline.bloomWeight = visualConfig.mobileVisuals.bloom.weight;
+        this.renderPipeline.bloomKernel = visualConfig.mobileVisuals.bloom.kernel;
+        this.renderPipeline.bloomScale = visualConfig.mobileVisuals.bloom.scale;
+      } else {
+        this.renderPipeline.bloomThreshold = visualConfig.postProcess.bloom.threshold;
+        this.renderPipeline.bloomWeight = visualConfig.postProcess.bloom.weight;
+        this.renderPipeline.bloomKernel = visualConfig.postProcess.bloom.kernel;
+        this.renderPipeline.bloomScale = visualConfig.postProcess.bloom.scale;
+      }
     }
     
-    // Chromatic Aberration
-    if (visualConfig.postProcess.chromaticAberration.enabled) {
+    // Chromatic Aberration - Only on desktop/high-end for performance
+    if (visualConfig.postProcess.chromaticAberration.enabled && (!isMobile || isHighEnd)) {
       this.renderPipeline.chromaticAberrationEnabled = true;
       this.renderPipeline.chromaticAberration.aberrationAmount = 
         visualConfig.postProcess.chromaticAberration.amount;
     }
     
-    // Grain
-    if (visualConfig.postProcess.grain.enabled) {
+    // Grain - Only on desktop for cleaner mobile experience
+    if (visualConfig.postProcess.grain.enabled && !isMobile) {
       this.renderPipeline.grainEnabled = true;
       this.renderPipeline.grain.intensity = visualConfig.postProcess.grain.intensity;
       this.renderPipeline.grain.animated = true;
     }
     
-    // Vignette (image processing)
+    // Vignette (image processing) - Enabled for all devices for horror feel
     this.renderPipeline.imageProcessingEnabled = true;
     if (visualConfig.postProcess.vignette.enabled) {
       this.renderPipeline.imageProcessing.vignetteEnabled = true;
       this.renderPipeline.imageProcessing.vignetteWeight = 
-        visualConfig.postProcess.vignette.weight;
+        isMobile ? visualConfig.postProcess.vignette.weight * 0.8 : visualConfig.postProcess.vignette.weight;
       this.renderPipeline.imageProcessing.vignetteColor = new Color4(
         visualConfig.postProcess.vignette.color.r,
         visualConfig.postProcess.vignette.color.g,
@@ -158,14 +170,29 @@ export class SceneManager {
       );
     }
     
-    // Tone mapping
+    // Enhanced Tone mapping and color correction
     this.renderPipeline.imageProcessing.toneMappingEnabled = true;
-    this.renderPipeline.imageProcessing.toneMappingType = 1; // ACES
-    this.renderPipeline.imageProcessing.contrast = 1.2;
-    this.renderPipeline.imageProcessing.exposure = 0.9;
+    this.renderPipeline.imageProcessing.toneMappingType = 1; // ACES for cinematic look
     
-    // FXAA
+    // Apply color correction settings
+    const colorCorrection = visualConfig.postProcess.colorCorrection;
+    if (colorCorrection?.enabled) {
+      this.renderPipeline.imageProcessing.contrast = colorCorrection.contrast;
+      this.renderPipeline.imageProcessing.exposure = colorCorrection.exposure;
+    } else {
+      this.renderPipeline.imageProcessing.contrast = 1.25;
+      this.renderPipeline.imageProcessing.exposure = 0.95;
+    }
+    
+    // FXAA anti-aliasing - Enabled for all devices
     this.renderPipeline.fxaaEnabled = true;
+    
+    // Sharpen - Only on desktop for performance
+    if (visualConfig.postProcess.sharpen?.enabled && !isMobile) {
+      this.renderPipeline.sharpenEnabled = true;
+      this.renderPipeline.sharpen.edgeAmount = visualConfig.postProcess.sharpen.edge;
+      this.renderPipeline.sharpen.colorAmount = visualConfig.postProcess.sharpen.intensity;
+    }
   }
   
   // ===========================================================================
