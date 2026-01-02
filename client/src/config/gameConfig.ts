@@ -38,66 +38,66 @@ export const gameConfig = {
 // =============================================================================
 
 export const visualConfig = {
-  // Color Palette - Enhanced for visual impact
+  // Color Palette - Enhanced for visual impact (IMPROVED)
   colors: {
-    // Primary
-    shadowDark: '#0a0a12',      // Deep navy/black shadows
-    infectionPrimary: '#00ffcc', // Teal bioluminescent
-    infectionSecondary: '#39ff14', // Sickly green
-    navigationWarm: '#ff6b00',   // Orange emergency lights
-    dangerRed: '#8b0000',        // Boss areas
+    // Primary - More vibrant and atmospheric
+    shadowDark: '#080810',      // Deeper navy/black shadows for contrast
+    infectionPrimary: '#00ffdd', // Brighter teal bioluminescent
+    infectionSecondary: '#44ff22', // More vibrant sickly green
+    navigationWarm: '#ff7700',   // Brighter orange emergency lights
+    dangerRed: '#cc0000',        // More visible boss areas
     
-    // Secondary
-    metalGunmetal: '#2a2d35',    // Dubai architecture
-    concreteWet: '#4a4a4a',      // Floors, walls
-    goldTarnished: '#8b7355',    // Corrupted luxury
-    waterBlack: '#0a0a0a',       // Standing water
+    // Secondary - Better contrast
+    metalGunmetal: '#2a2d38',    // Dubai architecture
+    concreteWet: '#555555',      // Lighter floors/walls for visibility
+    goldTarnished: '#9b8365',    // Brighter corrupted luxury
+    waterBlack: '#0c0c0c',       // Standing water with slight visibility
     
-    // Enhanced accent colors
-    vecnaPurple: '#660066',      // Vecna's aura
-    portalViolet: '#9900ff',     // Dimensional rifts
-    memoryGold: '#ffd700',       // Memory/evidence glow
-    healthGreen: '#00ff66',      // Health pickups
+    // Enhanced accent colors - More saturated
+    vecnaPurple: '#8800aa',      // Brighter Vecna's aura
+    portalViolet: '#aa22ff',     // More visible dimensional rifts
+    memoryGold: '#ffdd00',       // Warmer memory/evidence glow
+    healthGreen: '#00ff77',      // Brighter health pickups
   },
   
-  // Atmosphere
+  // Atmosphere - Better visibility while maintaining horror feel
   fog: {
     enabled: true,
-    color: { r: 0.04, g: 0.04, b: 0.07 }, // Deep navy with teal tint
-    density: 0.015,
-    start: 10,
-    end: 80,
+    color: { r: 0.05, g: 0.05, b: 0.08 }, // Slightly lighter for better visibility
+    density: 0.012,              // Reduced fog for clearer gameplay
+    start: 15,                   // Fog starts further away
+    end: 100,                    // Extended draw distance
   },
   
-  // Ambient Light
+  // Ambient Light - Slightly brighter for better UX
   ambient: {
-    intensity: 0.1,
-    color: { r: 0.04, g: 0.04, b: 0.1 }, // Deep blue
+    intensity: 0.15,             // Increased from 0.1 for visibility
+    color: { r: 0.06, g: 0.06, b: 0.12 }, // Slightly lighter blue
   },
   
-  // Post-Processing - Enhanced for cinematic feel
+  // Post-Processing - Enhanced for cinematic feel (IMPROVED)
   postProcess: {
     bloom: {
       enabled: true,
-      threshold: 0.5,       // Lower threshold = more bloom
-      weight: 0.5,          // Stronger bloom weight
+      threshold: 0.4,       // Lower threshold = more glow on bright objects
+      weight: 0.6,          // Stronger bloom for dramatic lighting
       kernel: 64,
-      scale: 0.6,
+      scale: 0.7,           // Larger bloom radius
     },
     vignette: {
       enabled: true,
-      weight: 1.5,          // Darker edges for horror feel
-      color: { r: 0.15, g: 0, b: 0.05 }, // Slight purple tint
+      weight: 1.2,          // Slightly reduced for better visibility
+      color: { r: 0.12, g: 0, b: 0.06 }, // Subtle purple-red tint
     },
     chromaticAberration: {
       enabled: true,
-      amount: 15,           // More distortion for unsettling effect
+      amount: 12,           // Reduced for less eye strain
     },
     grain: {
       enabled: true,
-      intensity: 0.08,      // More visible grain for film quality
+      intensity: 0.06,      // Reduced for cleaner visuals
     },
-    // New effects
+    // Enhanced effects
     depthOfField: {
       enabled: false,       // Disable by default for performance
       focalLength: 100,
@@ -106,26 +106,42 @@ export const visualConfig = {
     },
     sharpen: {
       enabled: true,
-      edge: 0.3,
-      intensity: 0.2,
+      edge: 0.4,            // Increased for crisper textures
+      intensity: 0.25,      // More sharpening for detail
+    },
+    // NEW: Color correction for cinematic look
+    colorCorrection: {
+      enabled: true,
+      contrast: 1.25,       // Higher contrast for dramatic effect
+      exposure: 0.95,       // Slightly darker for horror atmosphere
+      saturation: 1.1,      // Slightly more saturated colors
     },
   },
   
-  // Mobile-optimized visuals
+  // Mobile-optimized visuals - IMPROVED for better experience
   mobileVisuals: {
     fog: {
       enabled: true,
-      density: 0.012,       // Less fog for better visibility
+      density: 0.010,       // Even less fog for mobile visibility
     },
     bloom: {
-      enabled: true,
-      threshold: 0.7,
-      weight: 0.3,
+      enabled: true,        // Keep bloom for atmosphere
+      threshold: 0.6,       // Lower threshold for more glow
+      weight: 0.4,          // Increased for visual impact
       kernel: 32,
-      scale: 0.4,
+      scale: 0.5,
+    },
+    // NEW: Enable some post-processing on mobile
+    postProcessing: {
+      enabled: true,        // Enable limited post-processing
+      vignette: true,       // Keep vignette for horror feel
+      chromaticAberration: false, // Disable for performance
+      grain: false,         // Disable for cleaner mobile look
     },
     reducedParticles: true,
     simplifiedLighting: true,
+    // NEW: Quality presets
+    qualityPreset: 'balanced', // 'low', 'balanced', 'high'
   },
 };
 
@@ -368,38 +384,45 @@ export const levelConfig = {
 };
 
 // =============================================================================
-// PERFORMANCE CONFIGURATION
+// PERFORMANCE CONFIGURATION - Enhanced for better visuals
 // =============================================================================
 
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
   navigator.userAgent
 );
 
+// Detect high-performance mobile devices
+const isHighEndMobile = isMobile && (
+  navigator.hardwareConcurrency >= 4 || 
+  /iPhone\s*(1[2-9]|[2-9][0-9])|iPad\s*Pro|Pixel\s*[6-9]/i.test(navigator.userAgent)
+);
+
 export const performanceConfig = {
   isMobile,
+  isHighEndMobile,
   
-  // Rendering
-  renderScale: isMobile ? 0.75 : 1.0,
-  targetFPS: isMobile ? 30 : 60,
+  // Rendering - Better quality
+  renderScale: isMobile ? (isHighEndMobile ? 0.9 : 0.8) : 1.0,
+  targetFPS: isMobile ? (isHighEndMobile ? 45 : 30) : 60,
   
-  // Shadows
-  shadowsEnabled: !isMobile,
-  shadowMapSize: isMobile ? 512 : 1024,
+  // Shadows - Enable on high-end mobile
+  shadowsEnabled: !isMobile || isHighEndMobile,
+  shadowMapSize: isMobile ? (isHighEndMobile ? 768 : 512) : 1024,
   
-  // Particles
+  // Particles - More particles for better effects
   particlesEnabled: true,
-  particleLimit: isMobile ? 50 : 200,
+  particleLimit: isMobile ? (isHighEndMobile ? 100 : 60) : 250,
   
-  // Post-Processing
-  postProcessEnabled: !isMobile,
-  bloomEnabled: !isMobile,
+  // Post-Processing - Enable on mobile for atmosphere
+  postProcessEnabled: true, // Now enabled for all devices
+  bloomEnabled: true,       // Bloom enabled for atmosphere
   
-  // LOD
+  // LOD - Extended draw distance
   lodEnabled: true,
-  lodDistance: isMobile ? 30 : 50,
+  lodDistance: isMobile ? (isHighEndMobile ? 45 : 35) : 60,
   
-  // Draw Calls
-  maxDrawCalls: isMobile ? 80 : 150,
+  // Draw Calls - Increased for better visuals
+  maxDrawCalls: isMobile ? (isHighEndMobile ? 120 : 90) : 180,
   
   // Enemies
   maxEnemies: isMobile ? 10 : 20,
