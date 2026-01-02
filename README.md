@@ -1,5 +1,8 @@
 # SAVE ISMAEL
 
+[![Open in VS Code](https://img.shields.io/badge/Open%20in-VS%20Code-007ACC?logo=visualstudiocode)](https://vscode.dev/github/ismaelloveexcel/Dubai-Terror)
+[![Open in GitHub Codespaces](https://img.shields.io/badge/Open%20in-GitHub%20Codespaces-24292e?logo=github)](https://codespaces.new/ismaelloveexcel/Dubai-Terror)
+
 > **An Upside Down Dubai Adventure**  
 > *A Stranger Things-inspired 3D FPS game - A gift from Uncle Ismael to Aidan*
 
