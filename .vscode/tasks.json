@@ -1,0 +1,57 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Install All Dependencies",
+      "type": "npm",
+      "script": "install:all",
+      "problemMatcher": [],
+      "detail": "Install dependencies for root, client, and server"
+    },
+    {
+      "label": "Dev: Client",
+      "type": "npm",
+      "script": "dev",
+      "path": "client/",
+      "problemMatcher": [],
+      "detail": "Start client development server"
+    },
+    {
+      "label": "Dev: Server",
+      "type": "npm",
+      "script": "dev",
+      "path": "server/",
+      "problemMatcher": [],
+      "detail": "Start server development server"
+    },
+    {
+      "label": "Dev: Full Stack",
+      "type": "npm",
+      "script": "dev",
+      "problemMatcher": [],
+      "detail": "Start both client and server concurrently"
+    },
+    {
+      "label": "Build Client",
+      "type": "npm",
+      "script": "build",
+      "path": "client/",
+      "problemMatcher": [],
+      "detail": "Build client for production"
+    },
+    {
+      "label": "Build: Production",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": [],
+      "detail": "Build full project for production"
+    },
+    {
+      "label": "Clean All",
+      "type": "npm",
+      "script": "clean",
+      "problemMatcher": [],
+      "detail": "Remove all node_modules and dist folders"
+    }
+  ]
+}
