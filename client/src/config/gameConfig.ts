@@ -79,23 +79,24 @@ export const visualConfig = {
   postProcess: {
     bloom: {
       enabled: true,
-      threshold: 0.4,       // Lower threshold = more glow on bright objects
-      weight: 0.6,          // Stronger bloom for dramatic lighting
-      kernel: 64,
-      scale: 0.7,           // Larger bloom radius
+      threshold: 0.35,      // Lower threshold = more glow on bright objects
+      weight: 0.7,          // Stronger bloom for dramatic lighting
+      kernel: 96,           // Higher quality blur
+      scale: 0.8,           // Larger bloom radius
     },
     vignette: {
       enabled: true,
       weight: 1.2,          // Slightly reduced for better visibility
       color: { r: 0.12, g: 0, b: 0.06 }, // Subtle purple-red tint
+      animated: true,       // Enable subtle pulsing
     },
     chromaticAberration: {
       enabled: true,
-      amount: 12,           // Reduced for less eye strain
+      amount: 10,           // Reduced for less eye strain
     },
     grain: {
       enabled: true,
-      intensity: 0.06,      // Reduced for cleaner visuals
+      intensity: 0.05,      // Reduced for cleaner visuals
     },
     // Enhanced effects
     depthOfField: {
@@ -106,15 +107,34 @@ export const visualConfig = {
     },
     sharpen: {
       enabled: true,
-      edge: 0.4,            // Increased for crisper textures
-      intensity: 0.25,      // More sharpening for detail
+      edge: 0.45,           // Increased for crisper textures
+      intensity: 0.3,       // More sharpening for detail
     },
-    // NEW: Color correction for cinematic look
+    // Color correction for cinematic look
     colorCorrection: {
       enabled: true,
-      contrast: 1.25,       // Higher contrast for dramatic effect
-      exposure: 0.95,       // Slightly darker for horror atmosphere
-      saturation: 1.1,      // Slightly more saturated colors
+      contrast: 1.3,        // Higher contrast for dramatic effect
+      exposure: 0.92,       // Slightly darker for horror atmosphere
+      saturation: 1.05,     // Slightly more saturated colors
+    },
+    // NEW: SSAO (Screen Space Ambient Occlusion)
+    ssao: {
+      enabled: true,        // Enable for desktop
+      radius: 2.5,          // Occlusion radius
+      totalStrength: 1.3,   // Overall darkness
+      samples: 16,          // Quality (8-32)
+    },
+    // NEW: Realistic shadows
+    realisticShadows: {
+      enabled: true,
+      contactHardening: true,
+      softness: 32,
+    },
+    // NEW: Atmospheric effects
+    atmosphericEffects: {
+      dust: true,           // Floating dust particles
+      groundFog: true,      // Low-lying fog
+      ambientGI: true,      // Multi-directional ambient lighting
     },
   },
   

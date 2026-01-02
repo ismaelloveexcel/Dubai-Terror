@@ -1,5 +1,5 @@
 // SceneManager.ts - Scene Setup & Post-Processing
-// Save Ismael - Premium Visual Direction
+// Save Ismael - Premium Visual Direction with Realistic Graphics Enhancements
 
 import {
   Scene,
@@ -17,8 +17,16 @@ import {
   PBRMaterial,
   Mesh,
   MeshBuilder,
+  Camera,
+  SSAO2RenderingPipeline,
 } from '@babylonjs/core';
 import { visualConfig, performanceConfig } from '../config/gameConfig';
+import { 
+  RealisticEffectsManager,
+  RealisticShadows,
+  FlickeringLight,
+  FireLight 
+} from '../utils/RealisticEffects';
 
 export class SceneManager {
   private scene: Scene;
@@ -31,6 +39,11 @@ export class SceneManager {
   // Effects
   private glowLayer: GlowLayer | null = null;
   private renderPipeline: DefaultRenderingPipeline | null = null;
+  
+  // Realistic Effects (NEW)
+  private realisticEffects: RealisticEffectsManager | null = null;
+  private realisticShadows: RealisticShadows | null = null;
+  private ssaoPipeline: SSAO2RenderingPipeline | null = null;
   
   constructor(scene: Scene) {
     this.scene = scene;
@@ -390,10 +403,170 @@ export class SceneManager {
   }
   
   // ===========================================================================
+  // REALISTIC GRAPHICS ENHANCEMENTS (NEW)
+  // ===========================================================================
+  
+  /**
+   * Initialize the realistic effects manager
+   * Call this after the camera is set up
+   */
+  public setupRealisticEffects(camera: Camera): RealisticEffectsManager {
+    if (this.realisticEffects) {
+      return this.realisticEffects;
+    }
+    
+    this.realisticEffects = new RealisticEffectsManager(
+      this.scene,
+      camera,
+      performanceConfig.isMobile
+    );
+    
+    return this.realisticEffects;
+  }
+  
+  /**
+   * Enable all realistic visual effects
+   * Includes: atmospheric dust, ground fog, ambient GI, SSAO, animated vignette
+   */
+  public enableRealisticEffects(camera: Camera): void {
+    const effects = this.setupRealisticEffects(camera);
+    effects.enableAllEffects(this.renderPipeline || undefined);
+  }
+  
+  /**
+   * Enable atmospheric dust particles that follow the camera
+   */
+  public enableAtmosphericDust(camera: Camera): void {
+    const effects = this.setupRealisticEffects(camera);
+    effects.enableAtmosphericDust();
+  }
+  
+  /**
+   * Enable ground fog effect for horror atmosphere
+   */
+  public enableGroundFog(camera: Camera): void {
+    const effects = this.setupRealisticEffects(camera);
+    effects.enableGroundFog();
+  }
+  
+  /**
+   * Enable SSAO (Screen Space Ambient Occlusion) for realistic shadows
+   * Note: Desktop only, has performance impact
+   */
+  public setupSSAO(camera: Camera): SSAO2RenderingPipeline | null {
+    if (performanceConfig.isMobile) {
+      console.log('SSAO disabled on mobile for performance');
+      return null;
+    }
+    
+    try {
+      const ssaoRatio = {
+        ssaoRatio: 0.5,
+        blurRatio: 0.5
+      };
+      
+      this.ssaoPipeline = new SSAO2RenderingPipeline(
+        'ssao',
+        this.scene,
+        ssaoRatio,
+        [camera]
+      );
+      
+      // Configure SSAO for horror atmosphere
+      this.ssaoPipeline.radius = 2.5;
+      this.ssaoPipeline.totalStrength = 1.3;
+      this.ssaoPipeline.base = 0.1;
+      this.ssaoPipeline.expensiveBlur = true;
+      this.ssaoPipeline.samples = 16;
+      this.ssaoPipeline.maxZ = 80;
+      
+      return this.ssaoPipeline;
+    } catch (e) {
+      console.warn('SSAO not supported:', e);
+      return null;
+    }
+  }
+  
+  /**
+   * Enable enhanced realistic shadows with contact hardening
+   */
+  public setupRealisticShadows(): void {
+    if (!this.mainLight) return;
+    
+    // Dispose existing shadow generator
+    this.shadowGenerator?.dispose();
+    
+    // Create new realistic shadows
+    this.realisticShadows = new RealisticShadows(
+      this.scene,
+      this.mainLight,
+      performanceConfig.shadowMapSize,
+      performanceConfig.isMobile
+    );
+    
+    this.shadowGenerator = this.realisticShadows.getShadowGenerator();
+  }
+  
+  /**
+   * Add a flickering emergency light (e.g., for corridors, damaged areas)
+   */
+  public addFlickeringLight(
+    name: string,
+    position: Vector3,
+    color: Color3 = new Color3(1, 0.4, 0),
+    intensity: number = 1.5
+  ): FlickeringLight | null {
+    if (!this.realisticEffects) {
+      console.warn('Call setupRealisticEffects first before adding flickering lights');
+      return null;
+    }
+    return this.realisticEffects.addFlickeringLight(name, position, color, intensity);
+  }
+  
+  /**
+   * Add a fire/torch light with organic flickering
+   */
+  public addFireLight(
+    name: string,
+    position: Vector3,
+    intensity: number = 1.0
+  ): FireLight | null {
+    if (!this.realisticEffects) {
+      console.warn('Call setupRealisticEffects first before adding fire lights');
+      return null;
+    }
+    return this.realisticEffects.addFireLight(name, position, intensity);
+  }
+  
+  /**
+   * Enable animated vignette for horror atmosphere
+   */
+  public enableAnimatedVignette(): void {
+    if (!this.renderPipeline) {
+      console.warn('Post-processing must be set up before enabling animated vignette');
+      return;
+    }
+    
+    if (this.realisticEffects) {
+      this.realisticEffects.enableAnimatedVignette(this.renderPipeline);
+    }
+  }
+  
+  /**
+   * Get the realistic effects manager for advanced control
+   */
+  public getRealisticEffects(): RealisticEffectsManager | null {
+    return this.realisticEffects;
+  }
+  
+  // ===========================================================================
   // CLEANUP
   // ===========================================================================
   
   public dispose(): void {
+    this.realisticEffects?.dispose();
+    this.realisticShadows?.dispose();
+    this.ssaoPipeline?.dispose();
     this.renderPipeline?.dispose();
     this.glowLayer?.dispose();
     this.shadowGenerator?.dispose();
