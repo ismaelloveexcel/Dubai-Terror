@@ -464,8 +464,8 @@ export class SceneManager {
     const effects = this.setupRealisticEffects(camera);
     const ssaoEffect = effects.enableSSAO();
     
-    // Return the underlying pipeline for direct access if needed
-    return ssaoEffect ? (ssaoEffect as any).ssao : null;
+    // Return the underlying pipeline using the type-safe getter
+    return ssaoEffect ? ssaoEffect.getPipeline() : null;
   }
   
   /**

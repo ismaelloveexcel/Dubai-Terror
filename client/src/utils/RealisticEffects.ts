@@ -358,8 +358,13 @@ export class AnimatedVignette {
   }
 
   public setDangerMode(healthPercent: number): void {
+    // Use current time from scene for consistent pulse when pulsing is not active
+    const currentTime = this.scene.getEngine().getDeltaTime() 
+      ? performance.now() * 0.001 
+      : this.time;
+    
     if (healthPercent < 0.3) {
-      const dangerPulse = Math.sin(this.time * 3) * 0.5 + 0.5;
+      const dangerPulse = Math.sin(currentTime * 3) * 0.5 + 0.5;
       const intensity = (1 - healthPercent / 0.3) * dangerPulse;
       this.pipeline.imageProcessing.vignetteWeight = this.baseWeight + intensity;
       this.pipeline.imageProcessing.vignetteColor = new BABYLON.Color4(0.5, 0, 0, 1);
@@ -425,6 +430,13 @@ export class SSAOEffect {
     if (this.ssao) {
       this.ssao.totalStrength = intensity;
     }
+  }
+
+  /**
+   * Get the underlying SSAO2RenderingPipeline for advanced configuration
+   */
+  public getPipeline(): BABYLON.SSAO2RenderingPipeline | null {
+    return this.ssao;
   }
 
   public dispose(): void {
