@@ -84,25 +84,41 @@ export class AudioManager {
   // ===========================================================================
   
   private preloadNeverEndingStory(): void {
-    try {
-      const neverEndingStory = new Sound(
-        'never-ending-story',
-        '/assets/audio/music/never-ending-story.mp3',
-        this.scene,
-        () => {
-          this.neverEndingStoryLoaded = true;
-          console.log('🎵 Never Ending Story loaded - Ready for Aidan\'s dedication!');
-        },
-        {
-          loop: false,
-          autoplay: false,
-          volume: this.masterVolume * this.musicVolume,
+    // Use fetch to check if audio file exists before attempting to load
+    // This prevents Babylon.js Sound from blocking on 404 errors
+    fetch('/assets/audio/music/never-ending-story.mp3', { method: 'HEAD' })
+      .then(response => {
+        if (response.ok) {
+          // File exists, safe to load with Babylon
+          try {
+            const neverEndingStory = new Sound(
+              'never-ending-story',
+              '/assets/audio/music/never-ending-story.mp3',
+              this.scene,
+              () => {
+                this.neverEndingStoryLoaded = true;
+                console.log('Never Ending Story loaded - Ready for Aidan\'s dedication!');
+              },
+              {
+                loop: false,
+                autoplay: false,
+                volume: this.masterVolume * this.musicVolume,
+              }
+            );
+            this.sounds.set('never-ending-story', neverEndingStory);
+          } catch (e) {
+            console.log('Never Ending Story will use procedural fallback');
+            this.neverEndingStoryLoaded = false;
+          }
+        } else {
+          console.log('Never Ending Story audio not found - will use procedural fallback');
+          this.neverEndingStoryLoaded = false;
         }
-      );
-      this.sounds.set('never-ending-story', neverEndingStory);
-    } catch (e) {
-      console.log('Never Ending Story will use procedural fallback');
-    }
+      })
+      .catch(() => {
+        console.log('Never Ending Story audio unavailable - will use procedural fallback');
+        this.neverEndingStoryLoaded = false;
+      });
   }
   
   /**
