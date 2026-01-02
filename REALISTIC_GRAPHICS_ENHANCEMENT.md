@@ -455,15 +455,20 @@ public createEmergencyLight(position: Vector3): PointLight {
   light.diffuse = new BABYLON.Color3(1, 0.3, 0);
   light.range = 15;
   
-  // Flicker pattern
+  // Flicker pattern using deterministic noise
   let time = 0;
+  // Use a seeded random for reproducible flicker pattern
+  const seed = position.x * 1000 + position.z;
+  const seededNoise = (t: number) => Math.sin(t * 17.3 + seed) * 0.5 + 0.5;
+  
   this.scene.onBeforeRenderObservable.add(() => {
     time += this.scene.getEngine().getDeltaTime() * 0.001;
     
-    // Complex flicker pattern
+    // Complex flicker pattern using deterministic functions
     const flicker1 = Math.sin(time * 8) > 0 ? 1 : 0;
     const flicker2 = Math.sin(time * 3.7 + 1) > 0.3 ? 1 : 0.3;
-    const flicker3 = Math.random() > 0.95 ? 0 : 1;
+    // Use seeded noise instead of Math.random() for consistent frame timing
+    const flicker3 = seededNoise(time * 20) > 0.95 ? 0 : 1;
     
     light.intensity = 1.5 * flicker1 * flicker2 * flicker3;
   });
@@ -712,14 +717,22 @@ public class AnimatedSprite {
 Dust, fog particles, and ambient effects.
 
 ```typescript
+// Define particle textures as constants for better readability
+// These would typically be in a separate constants file like: src/config/particleTextures.ts
+const PARTICLE_TEXTURES = {
+  // 8x8 white circle SVG for dust particles
+  dust: '/assets/textures/particles/dust_circle.png', // Recommended: Use actual image files
+  // Fallback base64 if no file available:
+  // 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjQiIGN5PSI0IiByPSIyIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg=='
+  rain: '/assets/textures/particles/rain_drop.png',
+};
+
 // Atmospheric dust particles
 public createAtmosphericDust(): ParticleSystem {
   const dust = new BABYLON.ParticleSystem('dust', 500, this.scene);
   
-  dust.particleTexture = new BABYLON.Texture(
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOCIgaGVpZ2h0PSI4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9IjQiIGN5PSI0IiByPSIyIiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==',
-    this.scene
-  );
+  // Use external texture file for better readability and caching
+  dust.particleTexture = new BABYLON.Texture(PARTICLE_TEXTURES.dust, this.scene);
   
   // Spawn in large area around player
   dust.emitter = new BABYLON.Vector3(0, 2, 0);
@@ -762,10 +775,9 @@ public createAtmosphericDust(): ParticleSystem {
 public createRainEffect(): ParticleSystem {
   const rain = new BABYLON.ParticleSystem('rain', 2000, this.scene);
   
-  rain.particleTexture = new BABYLON.Texture(
-    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNCIgaGVpZ2h0PSIzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB4PSIxIiB5PSIwIiB3aWR0aD0iMiIgaGVpZ2h0PSIzMiIgZmlsbD0icmdiYSgxNTAsMTgwLDIwMCwwLjYpIi8+PC9zdmc+',
-    this.scene
-  );
+  // Use external texture file for better readability and caching
+  // The rain texture should be a 4x32 vertical streak image
+  rain.particleTexture = new BABYLON.Texture(PARTICLE_TEXTURES.rain, this.scene);
   
   rain.emitter = new BABYLON.Vector3(0, 30, 0);
   rain.minEmitBox = new BABYLON.Vector3(-30, 0, -30);
@@ -847,7 +859,7 @@ public createDecal(
   normal: Vector3,
   texturePath: string,
   size: number
-): Mesh {
+): Mesh | null {  // Return type includes null for when no mesh is found
   // Find nearby mesh to project onto
   const ray = new BABYLON.Ray(
     position.add(normal.scale(0.1)),
