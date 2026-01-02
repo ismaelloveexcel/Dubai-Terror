@@ -39,7 +39,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "fuser -k 5000/tcp || true; cd client && npm run dev -- --port 5000 --host 0.0.0.0 --strictPort"
+args = "cd client && npm run dev -- --port 5000 --host 0.0.0.0 --strictPort"
 waitForPort = 5000
 
 [deployment]
