@@ -15,10 +15,6 @@ externalPort = 80
 localPort = 5000
 externalPort = 80
 
-[[ports]]
-localPort = 5001
-externalPort = 3000
-
 [agent]
 expertMode = true
 
@@ -43,7 +39,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd client && npm run dev"
+args = "fuser -k 5000/tcp || true; cd client && npm run dev -- --port 5000 --host 0.0.0.0 --strictPort"
 waitForPort = 5000
 
 [deployment]
