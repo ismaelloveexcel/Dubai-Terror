@@ -79,6 +79,10 @@ export enum EnemyType {
   SHADOW_CLONE = 'shadowClone',
   MIND_FLAYER = 'mindFlayer',
   VECNA = 'vecna',
+  SWARM = 'swarm',
+  FLYING = 'flying',
+  ELITE = 'elite',
+  BOSS = 'boss',
 }
 
 // =============================================================================

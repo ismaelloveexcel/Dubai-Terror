@@ -30,15 +30,73 @@ export interface SpriteEffects {
   outlineWidth?: number;
 }
 
+const spriteManagerCache = new Map<string, BABYLON.SpriteManager>();
+let sharedGlowLayer: BABYLON.GlowLayer | null = null;
+const glowMeshRegistry = new Map<BABYLON.Mesh, { color: BABYLON.Color3; intensity: number }>();
+
+function getOrCreateSpriteManager(
+  key: string,
+  config: SpriteConfig,
+  scene: BABYLON.Scene
+): BABYLON.SpriteManager {
+  const cacheKey = `${key}_${config.spriteSheetUrl}`;
+  let manager = spriteManagerCache.get(cacheKey);
+  
+  if (!manager || manager.isDisposed()) {
+    manager = new BABYLON.SpriteManager(
+      `shared_${key}_manager`,
+      config.spriteSheetUrl,
+      200,
+      { width: config.frameWidth, height: config.frameHeight },
+      scene
+    );
+    spriteManagerCache.set(cacheKey, manager);
+  }
+  
+  return manager;
+}
+
+function getSharedGlowLayer(scene: BABYLON.Scene): BABYLON.GlowLayer {
+  if (!sharedGlowLayer || sharedGlowLayer.isDisposed()) {
+    sharedGlowLayer = new BABYLON.GlowLayer('sharedGlow', scene, {
+      mainTextureSamples: 2,
+      blurKernelSize: 32,
+    });
+    sharedGlowLayer.intensity = 0.5;
+    
+    sharedGlowLayer.customEmissiveColorSelector = (mesh, subMesh, material, result) => {
+      const glowData = glowMeshRegistry.get(mesh as BABYLON.Mesh);
+      if (glowData) {
+        result.set(
+          glowData.color.r * glowData.intensity,
+          glowData.color.g * glowData.intensity,
+          glowData.color.b * glowData.intensity,
+          1
+        );
+      }
+    };
+  }
+  return sharedGlowLayer;
+}
+
+function registerGlowMesh(mesh: BABYLON.Mesh, color: BABYLON.Color3, intensity: number): void {
+  glowMeshRegistry.set(mesh, { color, intensity });
+}
+
+function unregisterGlowMesh(mesh: BABYLON.Mesh): void {
+  glowMeshRegistry.delete(mesh);
+}
+
 export class SpriteRenderer {
   private sprite: BABYLON.Sprite;
   private spriteManager: BABYLON.SpriteManager;
   private currentAnimation: string = 'idle';
-  private glowLayer: BABYLON.GlowLayer | null = null;
   private shadowPlane: BABYLON.Mesh | null = null;
   private particleSystem: BABYLON.ParticleSystem | null = null;
+  private glowMesh: BABYLON.Mesh | null = null;
   private config: SpriteConfig;
   private scene: BABYLON.Scene;
+  private spriteKey: string;
 
   constructor(
     name: string,
@@ -48,25 +106,16 @@ export class SpriteRenderer {
   ) {
     this.scene = scene;
     this.config = config;
+    this.spriteKey = name.split('_')[0];
 
-    // Create sprite manager for this sprite type
-    this.spriteManager = new BABYLON.SpriteManager(
-      `${name}_manager`,
-      config.spriteSheetUrl,
-      100, // max capacity
-      { width: config.frameWidth, height: config.frameHeight },
-      scene
-    );
+    this.spriteManager = getOrCreateSpriteManager(this.spriteKey, config, scene);
 
-    // Create the sprite
     this.sprite = new BABYLON.Sprite(name, this.spriteManager);
     this.sprite.cellIndex = 0;
-    this.sprite.size = 1.5; // Default size, can be adjusted
+    this.sprite.size = 1.5;
 
-    // Enable billboard mode (always face camera)
     this.enableBillboard();
 
-    // Apply premium effects
     if (effects) {
       this.applyEffects(effects);
     }
@@ -85,24 +134,42 @@ export class SpriteRenderer {
    * Apply premium visual effects
    */
   private applyEffects(effects: SpriteEffects): void {
-    // Glow effect (emissive outline)
     if (effects.glowColor && effects.glowIntensity) {
-      if (!this.glowLayer) {
-        this.glowLayer = new BABYLON.GlowLayer('spriteGlow', this.scene);
-      }
-      // Note: Glow layer works on meshes, for sprites we'll handle via shader
-      // This is a placeholder for future mesh-based sprite implementation
+      this.createGlowEffect(effects.glowColor, effects.glowIntensity);
     }
 
-    // Shadow (ground projection)
     if (effects.shadowEnabled) {
       this.createShadowPlane();
     }
 
-    // Particle trail
     if (effects.particleTrail) {
       this.createParticleTrail();
     }
+  }
+
+  /**
+   * Create glow effect using shared GlowLayer
+   */
+  private createGlowEffect(color: BABYLON.Color3, intensity: number): void {
+    const glowLayer = getSharedGlowLayer(this.scene);
+    
+    this.glowMesh = BABYLON.MeshBuilder.CreatePlane(
+      `${this.spriteKey}_glow`,
+      { size: this.sprite.size * 1.2 },
+      this.scene
+    );
+    
+    this.glowMesh.billboardMode = BABYLON.Mesh.BILLBOARDMODE_ALL;
+    this.glowMesh.isPickable = false;
+    
+    const glowMat = new BABYLON.StandardMaterial(`${this.spriteKey}_glowMat`, this.scene);
+    glowMat.emissiveColor = color;
+    glowMat.disableLighting = true;
+    glowMat.alpha = 0.01;
+    this.glowMesh.material = glowMat;
+    
+    glowLayer.addIncludedOnlyMesh(this.glowMesh);
+    registerGlowMesh(this.glowMesh, color, intensity);
   }
 
   /**
@@ -189,13 +256,15 @@ export class SpriteRenderer {
   public setPosition(position: BABYLON.Vector3): void {
     this.sprite.position = position;
 
-    // Update shadow position
     if (this.shadowPlane) {
       this.shadowPlane.position.x = position.x;
       this.shadowPlane.position.z = position.z;
     }
 
-    // Update particle emitter
+    if (this.glowMesh) {
+      this.glowMesh.position = position.clone();
+    }
+
     if (this.particleSystem) {
       this.particleSystem.emitter = position;
     }
@@ -215,6 +284,9 @@ export class SpriteRenderer {
     this.sprite.size = size;
     if (this.shadowPlane) {
       this.shadowPlane.scaling = new BABYLON.Vector3(size, size, 1);
+    }
+    if (this.glowMesh) {
+      this.glowMesh.scaling = new BABYLON.Vector3(size * 1.2, size * 1.2, 1);
     }
   }
 
@@ -270,6 +342,13 @@ export class SpriteRenderer {
    */
   public dispose(): void {
     this.sprite.dispose();
+    if (this.glowMesh) {
+      if (sharedGlowLayer && !sharedGlowLayer.isDisposed()) {
+        sharedGlowLayer.removeIncludedOnlyMesh(this.glowMesh);
+      }
+      unregisterGlowMesh(this.glowMesh);
+      this.glowMesh.dispose();
+    }
     if (this.shadowPlane) {
       this.shadowPlane.dispose();
     }

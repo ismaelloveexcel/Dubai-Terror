@@ -31,8 +31,6 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
    * Row 4: Special/Glow variations
    */
   demodog: {
-    // Temporary: Uses SVG placeholder. Replace with real PNG when ready:
-    // spriteSheetUrl: '/assets/sprites/demodog_sheet.png',
     spriteSheetUrl: tempSpriteAssets.demodog,
     frameWidth: 128,
     frameHeight: 128,
@@ -49,13 +47,10 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
 
   /**
    * DEMOBAT - Flying terror
-   * Sprite sheet layout (512x512, 4x3 grid, 128px frames):
-   * Row 1: Idle/Hover (4 frames)
-   * Row 2: Fly (4 frames)
-   * Row 3: Attack (2 frames) + Death (2 frames)
+   * Uses temporary SVG sprites - replace with PNG when ready
    */
   demobat: {
-    spriteSheetUrl: '/assets/sprites/demobat_sheet.png',
+    spriteSheetUrl: tempSpriteAssets.demobat,
     frameWidth: 128,
     frameHeight: 128,
     totalFrames: 12,
@@ -68,20 +63,66 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
     },
   },
 
+  /**
+   * SWARM - Small swarming creatures
+   */
+  swarm: {
+    spriteSheetUrl: tempSpriteAssets.swarm,
+    frameWidth: 64,
+    frameHeight: 64,
+    totalFrames: 8,
+    framesPerRow: 4,
+    animations: {
+      idle: { startFrame: 0, endFrame: 1, loop: true, fps: 6 },
+      move: { startFrame: 2, endFrame: 5, loop: true, fps: 10 },
+      attack: { startFrame: 5, endFrame: 7, loop: false, fps: 12 },
+    },
+  },
+
+  /**
+   * FLYING - Flying enemies with wings
+   */
+  flying: {
+    spriteSheetUrl: tempSpriteAssets.flying,
+    frameWidth: 128,
+    frameHeight: 128,
+    totalFrames: 16,
+    framesPerRow: 4,
+    animations: {
+      idle: { startFrame: 0, endFrame: 3, loop: true, fps: 6 },
+      fly: { startFrame: 4, endFrame: 7, loop: true, fps: 10 },
+      attack: { startFrame: 8, endFrame: 11, loop: false, fps: 12 },
+      death: { startFrame: 12, endFrame: 15, loop: false, fps: 8 },
+    },
+  },
+
+  /**
+   * ELITE - Larger armored enemies
+   */
+  elite: {
+    spriteSheetUrl: tempSpriteAssets.elite,
+    frameWidth: 256,
+    frameHeight: 256,
+    totalFrames: 16,
+    framesPerRow: 4,
+    animations: {
+      idle: { startFrame: 0, endFrame: 1, loop: true, fps: 4 },
+      walk: { startFrame: 2, endFrame: 5, loop: true, fps: 8 },
+      attack: { startFrame: 6, endFrame: 11, loop: false, fps: 10 },
+      death: { startFrame: 12, endFrame: 15, loop: false, fps: 8 },
+    },
+  },
+
   // ==========================================================================
   // ELITE ENEMIES
   // ==========================================================================
 
   /**
    * DEMOGORGON - Level 2 Boss
-   * High-detail sprite (1024x1024, 4x4 grid, 256px frames)
-   * Row 1: Idle (2 frames) + Walk (4 frames)
-   * Row 2: Charge windup (3 frames) + Charge (3 frames)
-   * Row 3: Attack (4 frames)
-   * Row 4: Hurt (2 frames) + Death (2 frames)
+   * Uses temporary SVG sprites - replace with PNG when ready
    */
   demogorgon: {
-    spriteSheetUrl: '/assets/sprites/demogorgon_sheet.png',
+    spriteSheetUrl: tempSpriteAssets.demogorgon,
     frameWidth: 256,
     frameHeight: 256,
     totalFrames: 16,
@@ -91,9 +132,10 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
       walk: { startFrame: 2, endFrame: 5, loop: true, fps: 8 },
       chargeWindup: { startFrame: 6, endFrame: 8, loop: false, fps: 6 },
       charge: { startFrame: 9, endFrame: 11, loop: true, fps: 12 },
-      attack: { startFrame: 12, endFrame: 15, loop: false, fps: 10 },
+      attack: { startFrame: 6, endFrame: 9, loop: false, fps: 10 },
+      roar: { startFrame: 10, endFrame: 11, loop: false, fps: 6 },
       hurt: { startFrame: 14, endFrame: 15, loop: false, fps: 8 },
-      death: { startFrame: 14, endFrame: 15, loop: false, fps: 6 },
+      death: { startFrame: 12, endFrame: 15, loop: false, fps: 6 },
     },
   },
 
@@ -103,56 +145,48 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
 
   /**
    * MIND FLAYER - Level 4 Boss
-   * Ultra-detail sprite (1024x1024, 4x6 grid, 256px frames = 24 total)
-   * Phase-based animations
+   * Uses temporary SVG sprites - replace with PNG when ready
    */
   mindFlayer: {
-    spriteSheetUrl: '/assets/sprites/mindflayer_sheet.png',
+    spriteSheetUrl: tempSpriteAssets.mindFlayer,
+    frameWidth: 256,
+    frameHeight: 256,
+    totalFrames: 16,
+    framesPerRow: 4,
+    animations: {
+      idle: { startFrame: 0, endFrame: 3, loop: true, fps: 4 },
+      float: { startFrame: 0, endFrame: 3, loop: true, fps: 6 },
+      psychicAttack: { startFrame: 4, endFrame: 7, loop: false, fps: 10 },
+      aoeAttack: { startFrame: 4, endFrame: 7, loop: false, fps: 8 },
+      summon: { startFrame: 8, endFrame: 11, loop: false, fps: 6 },
+      hurt: { startFrame: 12, endFrame: 13, loop: false, fps: 8 },
+      death: { startFrame: 12, endFrame: 15, loop: false, fps: 4 },
+    },
+  },
+
+  /**
+   * VECNA - Final Boss
+   * Uses temporary SVG sprites - replace with PNG when ready
+   */
+  vecna: {
+    spriteSheetUrl: tempSpriteAssets.vecna,
     frameWidth: 256,
     frameHeight: 256,
     totalFrames: 24,
     framesPerRow: 4,
     animations: {
       idle: { startFrame: 0, endFrame: 3, loop: true, fps: 4 },
-      float: { startFrame: 4, endFrame: 7, loop: true, fps: 6 },
-      psychicAttack: { startFrame: 8, endFrame: 11, loop: false, fps: 10 },
-      aoeAttack: { startFrame: 12, endFrame: 15, loop: false, fps: 8 },
-      summon: { startFrame: 16, endFrame: 19, loop: false, fps: 6 },
-      hurt: { startFrame: 20, endFrame: 21, loop: false, fps: 8 },
-      death: { startFrame: 22, endFrame: 23, loop: false, fps: 4 },
-    },
-  },
-
-  /**
-   * VECNA - Final Boss
-   * Premium ultra-detail (1024x1024, 4x8 grid, 256px frames = 32 total)
-   * 4-phase boss with unique animations
-   */
-  vecna: {
-    spriteSheetUrl: '/assets/sprites/vecna_sheet.png',
-    frameWidth: 256,
-    frameHeight: 256,
-    totalFrames: 32,
-    framesPerRow: 4,
-    animations: {
-      // Phase 1: Telekinesis
-      idle: { startFrame: 0, endFrame: 3, loop: true, fps: 4 },
       telekinesis: { startFrame: 4, endFrame: 7, loop: false, fps: 8 },
-
-      // Phase 2: Mind invasion
       mindInvasion: { startFrame: 8, endFrame: 11, loop: false, fps: 6 },
-      fearProjection: { startFrame: 12, endFrame: 15, loop: true, fps: 8 },
-
-      // Phase 3: Shadow summon
-      summonEcho: { startFrame: 16, endFrame: 19, loop: false, fps: 6 },
-
-      // Phase 4: Desperation
-      desperationAttack: { startFrame: 20, endFrame: 23, loop: false, fps: 10 },
-      clockMechanic: { startFrame: 24, endFrame: 27, loop: true, fps: 5 },
-
-      // Universal
-      hurt: { startFrame: 28, endFrame: 29, loop: false, fps: 8 },
-      death: { startFrame: 30, endFrame: 31, loop: false, fps: 4 },
+      fearProjection: { startFrame: 8, endFrame: 11, loop: true, fps: 8 },
+      summonEcho: { startFrame: 8, endFrame: 11, loop: false, fps: 6 },
+      desperationAttack: { startFrame: 4, endFrame: 7, loop: false, fps: 10 },
+      clockMechanic: { startFrame: 0, endFrame: 3, loop: true, fps: 5 },
+      teleport: { startFrame: 12, endFrame: 15, loop: false, fps: 8 },
+      psychic: { startFrame: 8, endFrame: 11, loop: false, fps: 8 },
+      attack: { startFrame: 4, endFrame: 7, loop: false, fps: 10 },
+      hurt: { startFrame: 16, endFrame: 17, loop: false, fps: 8 },
+      death: { startFrame: 16, endFrame: 19, loop: false, fps: 4 },
     },
   },
 
@@ -161,7 +195,7 @@ export const spriteConfigs: { [key: string]: SpriteConfig } = {
   // ==========================================================================
 
   swarmCreature: {
-    spriteSheetUrl: '/assets/sprites/swarm_sheet.png',
+    spriteSheetUrl: tempSpriteAssets.swarm,
     frameWidth: 64,
     frameHeight: 64,
     totalFrames: 8,
