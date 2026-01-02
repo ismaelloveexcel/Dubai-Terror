@@ -5,8 +5,6 @@
     "ms-vscode.vscode-typescript-next",
     "bradlc.vscode-tailwindcss",
     "formulahendry.auto-rename-tag",
-    "dsznajder.es7-react-js-snippets",
-    "firefox-devtools.vscode-firefox-debug",
-    "msjsdiag.debugger-for-chrome"
+    "dsznajder.es7-react-js-snippets"
   ]
 }
