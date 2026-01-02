@@ -452,6 +452,7 @@ export class SceneManager {
   /**
    * Enable SSAO (Screen Space Ambient Occlusion) for realistic shadows
    * Note: Desktop only, has performance impact
+   * Uses the SSAOEffect wrapper from RealisticEffects for consistency
    */
   public setupSSAO(camera: Camera): SSAO2RenderingPipeline | null {
     if (performanceConfig.isMobile) {
@@ -459,32 +460,12 @@ export class SceneManager {
       return null;
     }
     
-    try {
-      const ssaoRatio = {
-        ssaoRatio: 0.5,
-        blurRatio: 0.5
-      };
-      
-      this.ssaoPipeline = new SSAO2RenderingPipeline(
-        'ssao',
-        this.scene,
-        ssaoRatio,
-        [camera]
-      );
-      
-      // Configure SSAO for horror atmosphere
-      this.ssaoPipeline.radius = 2.5;
-      this.ssaoPipeline.totalStrength = 1.3;
-      this.ssaoPipeline.base = 0.1;
-      this.ssaoPipeline.expensiveBlur = true;
-      this.ssaoPipeline.samples = 16;
-      this.ssaoPipeline.maxZ = 80;
-      
-      return this.ssaoPipeline;
-    } catch (e) {
-      console.warn('SSAO not supported:', e);
-      return null;
-    }
+    // Use the RealisticEffects manager's SSAO for consistency
+    const effects = this.setupRealisticEffects(camera);
+    const ssaoEffect = effects.enableSSAO();
+    
+    // Return the underlying pipeline for direct access if needed
+    return ssaoEffect ? (ssaoEffect as any).ssao : null;
   }
   
   /**

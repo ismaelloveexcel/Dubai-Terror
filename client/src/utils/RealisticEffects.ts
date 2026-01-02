@@ -321,8 +321,10 @@ export class AnimatedVignette {
   private pipeline: BABYLON.DefaultRenderingPipeline;
   private scene: BABYLON.Scene;
   private baseWeight: number;
+  private baseColor: BABYLON.Color4;
   private observer: BABYLON.Nullable<BABYLON.Observer<BABYLON.Scene>> = null;
   private time: number = 0;
+  private configuredStrength: number;
 
   constructor(
     scene: BABYLON.Scene,
@@ -332,6 +334,11 @@ export class AnimatedVignette {
     this.scene = scene;
     this.pipeline = pipeline;
     this.baseWeight = baseWeight;
+    this.configuredStrength = baseWeight;
+    // Store the original vignette color for restoration
+    this.baseColor = pipeline.imageProcessing.vignetteColor 
+      ? pipeline.imageProcessing.vignetteColor.clone()
+      : new BABYLON.Color4(0.12, 0, 0.06, 1);
   }
 
   public startPulsing(speed: number = 0.5, amplitude: number = 0.1): void {
@@ -356,6 +363,10 @@ export class AnimatedVignette {
       const intensity = (1 - healthPercent / 0.3) * dangerPulse;
       this.pipeline.imageProcessing.vignetteWeight = this.baseWeight + intensity;
       this.pipeline.imageProcessing.vignetteColor = new BABYLON.Color4(0.5, 0, 0, 1);
+    } else {
+      // Restore normal vignette when health is above danger threshold
+      this.pipeline.imageProcessing.vignetteWeight = this.baseWeight;
+      this.pipeline.imageProcessing.vignetteColor = this.baseColor;
     }
   }
 
@@ -370,9 +381,11 @@ export class AnimatedVignette {
 export class SSAOEffect {
   private ssao: BABYLON.SSAO2RenderingPipeline | null = null;
   private scene: BABYLON.Scene;
+  private configuredStrength: number;
 
   constructor(scene: BABYLON.Scene, camera: BABYLON.Camera, isMobile: boolean = false) {
     this.scene = scene;
+    this.configuredStrength = isMobile ? 1.0 : 1.3;
 
     try {
       const ssaoRatio = {
@@ -389,7 +402,7 @@ export class SSAOEffect {
 
       // Configure SSAO parameters
       this.ssao.radius = isMobile ? 1.5 : 2.5;
-      this.ssao.totalStrength = isMobile ? 1.0 : 1.3;
+      this.ssao.totalStrength = this.configuredStrength;
       this.ssao.base = 0.1;
       this.ssao.expensiveBlur = !isMobile;
       this.ssao.samples = isMobile ? 8 : 16;
@@ -403,8 +416,8 @@ export class SSAOEffect {
   public setEnabled(enabled: boolean): void {
     if (this.ssao) {
       // SSAO2RenderingPipeline doesn't have a simple enable/disable
-      // We can adjust totalStrength instead
-      this.ssao.totalStrength = enabled ? 1.3 : 0;
+      // We can adjust totalStrength instead, using the configured value
+      this.ssao.totalStrength = enabled ? this.configuredStrength : 0;
     }
   }
 
@@ -492,6 +505,9 @@ export class RealisticEffectsManager {
   private animatedVignette: AnimatedVignette | null = null;
   private flickeringLights: FlickeringLight[] = [];
   private fireLights: FireLight[] = [];
+  
+  // Store observer for proper cleanup
+  private dustPositionObserver: BABYLON.Nullable<BABYLON.Observer<BABYLON.Scene>> = null;
 
   constructor(scene: BABYLON.Scene, camera: BABYLON.Camera, isMobile: boolean = false) {
     this.scene = scene;
@@ -508,8 +524,13 @@ export class RealisticEffectsManager {
     }
     this.atmosphericDust.start();
 
-    // Update dust position with camera
-    this.scene.onBeforeRenderObservable.add(() => {
+    // Remove existing observer if any to prevent memory leaks
+    if (this.dustPositionObserver) {
+      this.scene.onBeforeRenderObservable.remove(this.dustPositionObserver);
+    }
+
+    // Update dust position with camera and store observer reference
+    this.dustPositionObserver = this.scene.onBeforeRenderObservable.add(() => {
       if (this.atmosphericDust && this.camera) {
         this.atmosphericDust.updateEmitterPosition(this.camera.position);
       }
@@ -608,6 +629,12 @@ export class RealisticEffectsManager {
    * Dispose all effects
    */
   public dispose(): void {
+    // Clean up dust position observer
+    if (this.dustPositionObserver) {
+      this.scene.onBeforeRenderObservable.remove(this.dustPositionObserver);
+      this.dustPositionObserver = null;
+    }
+    
     this.atmosphericDust?.dispose();
     this.groundFog?.dispose();
     this.ambientGI?.dispose();
